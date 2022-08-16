@@ -33,6 +33,11 @@ class ViewController: UICollectionViewController, UIImagePickerControllerDelegat
     
     @objc func loadpPhoto(){
         let picker = UIImagePickerController()
+        let sourceType = UIImagePickerController.isSourceTypeAvailable(.camera)
+        if sourceType {
+            picker.sourceType = .camera
+        }
+            
         picker.allowsEditing = true
         picker.delegate = self
         present(picker, animated: true)
@@ -60,14 +65,26 @@ class ViewController: UICollectionViewController, UIImagePickerControllerDelegat
         ac.addTextField()
 
         ac.addAction(UIAlertAction(title: "Cancel", style: .cancel))
-
+       
         ac.addAction(UIAlertAction(title: "OK", style: .default) { [weak self, weak ac] _ in
-            guard let newName = ac?.textFields?[0].text else { return }
-            person.name = newName
+            guard var newName = ac?.textFields?[0].text else { return }
+            if  !newName.isEmpty {
+                person.name = newName
+            } else {
+                newName = "Still Unknown"
+                person.name = newName
+            }
+                    
+            
 
             self?.collectionView.reloadData()
         })
-
+        ac.addAction(UIAlertAction(title: "Delete this face", style: .default) {
+            [weak self] _ in
+            
+            self?.people.remove(at: indexPath.item)
+            collectionView.reloadData()
+        })
         present(ac, animated: true)
     }
 
